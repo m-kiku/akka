@@ -598,6 +598,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter) extends
     case Terminated(endpoint) ⇒
       acceptPendingReader(takingOverFrom = endpoint)
       endpoints.unregisterEndpoint(endpoint)
+      stashedInbound.getOrElse(sender, Vector.empty) foreach (self ! _)
       stashedInbound -= endpoint
     case EndpointWriter.TookOver(endpoint, handle) ⇒
       removePendingReader(takingOverFrom = endpoint, withHandle = handle)
